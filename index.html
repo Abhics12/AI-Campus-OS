@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Campus OS — Production Workspace Build</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e6e8ef;--brand:#5b57e8;--brand2:#7b75ff;--good:#16834b;--warn:#b77900;--bad:#c0392b;--shadow:0 12px 35px rgba(30,35,60,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;font-size:14px}button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 20% 10%,#e8e7ff,transparent 35%),var(--bg)}
+.loginBox{width:min(430px,100%);background:#fff;border:1px solid var(--line);border-radius:25px;padding:28px;box-shadow:var(--shadow)}
+.logo{display:flex;gap:12px;align-items:center;margin-bottom:25px}.logoMark{width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-weight:900;font-size:20px}.logo h1{font-size:19px;margin:0}.logo p{font-size:10px;color:var(--muted);margin:4px 0 0}
+.field{margin:12px 0}.field label{display:block;font-size:10px;font-weight:800;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;background:#fff;outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px #ecebff}.primary,.secondary,.danger{border:0;border-radius:10px;padding:11px 14px;font-weight:800}.sessionGrid{display:grid;gap:12px}.sessionCard{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff;box-shadow:0 4px 14px rgba(30,35,60,.04)}.sessionTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.sessionTop h3{margin:7px 0 4px;font-size:15px}.sessionStats{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}.primary{background:var(--brand);color:#fff}.secondary{background:#fff;border:1px solid var(--line);color:var(--text)}.danger{background:#fff0ef;color:var(--bad);border:1px solid #ffd8d4}.small{padding:8px 10px;font-size:11px}.loginActions{display:grid;gap:9px;margin-top:18px}.demo{margin-top:16px;padding:12px;border:1px dashed #cfd2df;border-radius:12px;font-size:10px;color:var(--muted)}
+#app{min-height:100vh;display:grid;grid-template-columns:245px 1fr}.sidebar{position:sticky;top:0;height:100vh;background:#fff;border-right:1px solid var(--line);padding:18px 13px;overflow:auto}.sideLogo{font-weight:900;padding:10px 12px;margin-bottom:12px}.navGroup{font-size:9px;color:#9aa0ad;font-weight:900;padding:12px 12px 5px;text-transform:uppercase}.nav button{width:100%;text-align:left;border:0;background:transparent;padding:10px 12px;border-radius:10px;font-size:11px;color:#596273;margin:2px 0}.nav button.active,.nav button:hover{background:#eeedff;color:var(--brand);font-weight:800}.userSide{border-top:1px solid var(--line);margin-top:12px;padding:13px 8px}.userSide b{font-size:11px}.userSide small{display:block;color:var(--muted);font-size:9px;margin:4px 0 9px}.main{min-width:0}.top{height:65px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:10}.top h2{font-size:16px;margin:0}.topRight{display:flex;gap:8px;align-items:center}.bell{position:relative}.bell i{position:absolute;right:-4px;top:-5px;background:var(--brand);color:#fff;border-radius:9px;font-size:8px;min-width:15px;height:15px;display:grid;place-items:center;font-style:normal}.mobileMenu{display:none}.content{padding:22px;max-width:1250px;margin:auto}.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px;box-shadow:0 5px 20px rgba(30,35,60,.03);margin-bottom:12px}.title{display:flex;justify-content:space-between;align-items:center;gap:10px}.title h3{margin:0;font-size:15px}.muted{color:var(--muted);font-size:10px}.badge{display:inline-flex;padding:5px 8px;border-radius:8px;font-size:9px;font-weight:800;background:#f0f1f5;color:#626979}.purple{background:#ecebff;color:var(--brand)}.green{background:#e8f7ef;color:var(--good)}.orange{background:#fff4dc;color:var(--warn)}.red{background:#ffefed;color:var(--bad)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}.metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}.metric b{font-size:21px;display:block}.metric span{font-size:9px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.hero{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:20px;border-radius:18px;background:linear-gradient(135deg,#242044,#625ce8);color:#fff}.hero h1{margin:8px 0 5px;font-size:23px}.hero p{margin:0;color:#dedcff;font-size:10px}.hero .primary{background:#fff;color:#4e49cf}
+.tableWrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:10px}.table th,.table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.table th{color:var(--muted);font-size:9px}
+.list{display:grid;gap:8px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff}.row small{display:block;color:var(--muted);font-size:9px;margin-top:3px}.actions{display:flex;gap:6px;flex-wrap:wrap}.empty{text-align:center;color:var(--muted);padding:25px;font-size:11px}
+.profile{display:flex;align-items:center;gap:12px}.avatar{width:48px;height:48px;border-radius:15px;background:#ecebff;color:var(--brand);display:grid;place-items:center;font-weight:900;font-size:18px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.toolbar input,.toolbar select{padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:170px;font-size:10px}
+.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.formGrid .full{grid-column:1/-1}.modal{position:fixed;inset:0;background:rgba(10,15,30,.42);display:none;place-items:center;padding:15px;z-index:100}.modal.show{display:grid}.modalBox{width:min(650px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;padding:20px}.modalBox h3{margin:0 0 14px}.modalActions{display:flex;justify-content:flex-end;gap:7px;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);opacity:0;background:#1e2434;color:#fff;padding:10px 15px;border-radius:10px;font-size:10px;transition:.2s;z-index:200}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.fileBox{border:1px dashed #cfd2df;border-radius:12px;padding:12px}.fileBox small{color:var(--muted);font-size:9px}.attachmentCard{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fafaff;max-width:420px}.noticeImage{display:block;max-width:100%;max-height:240px;border-radius:9px;object-fit:contain;cursor:pointer}.attachmentMeta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;font-size:10px}.pdfPreview{min-height:74px;border-radius:9px;background:#f1f0ff;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;font-size:12px}.pdfPreview span{font-size:9px;color:var(--muted)}.statusBtn{padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:9px;font-weight:800}.statusBtn.on{background:#ecebff;border-color:#aaa5ff;color:var(--brand)}
+@media(max-width:850px){#app{grid-template-columns:1fr}.sidebar{position:fixed;left:-260px;z-index:80;width:245px;transition:.2s;box-shadow:var(--shadow)}.sidebar.open{left:0}.mobileMenu{display:block}.top{padding:0 12px}.content{padding:13px}.metrics{grid-template-columns:1fr 1fr}.grid2,.grid3{grid-template-columns:1fr}.formGrid{grid-template-columns:1fr}.formGrid .full{grid-column:auto}}
+</style>
+
+<style>
+button.secondary.small, button.primary.small { position:relative; z-index:5; pointer-events:auto; }
+.sessionCard .sessionTop button { pointer-events:auto; }
+</style>
+</head>
+<body>
+<section id="login">
+ <div class="loginBox">
+  <div class="logo"><div class="logoMark">AC</div><div><h1>AI Campus OS</h1><p>Smart College Management System</p></div></div>
+  <div id="loginFormWrap">
+   <div class="field"><label>Username</label><input id="loginUser" autocomplete="username" placeholder="Enter username"></div>
+   <div class="field"><label>Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="Enter password"></div>
+   <div id="loginErr" style="color:#c0392b;font-size:10px;min-height:14px"></div>
+   <div class="loginActions"><button class="primary" id="loginBtn">Sign in</button></div>
+   <div class="demo" id="demoHint"><b>Demo accounts</b><br>Admin: admin / admin123<br>Teacher: teacher1 / 1234<br>Student: student1 / 1234</div>
+   <div id="cloudSignupLink" class="hidden" style="text-align:center;margin-top:14px;font-size:11px"><a href="#" onclick="showSignup();return false;">New here? Create an account</a></div>
+  </div>
+  <div id="signupFormWrap" class="hidden">
+   <div class="field"><label>Full Name</label><input id="suName" placeholder="Your name"></div>
+   <div class="field"><label>Email</label><input id="suEmail" type="email" placeholder="you@college.edu"></div>
+   <div class="field"><label>Password</label><input id="suPass" type="password" placeholder="Choose a password"></div>
+   <div class="field"><label>Your Workspace (Department + Year)</label><select id="suWorkspace"><option value="">Loading...</option></select></div>
+   <div id="signupErr" style="color:#c0392b;font-size:10px;min-height:14px"></div>
+   <div class="loginActions"><button class="primary" onclick="signUp()">Create account</button></div>
+   <div style="text-align:center;margin-top:14px;font-size:11px"><a href="#" onclick="showLogin();return false;">Already have an account? Sign in</a></div>
+  </div>
+  <div id="pendingWrap" class="hidden" style="text-align:center">
+   <p>Your account is created. Ask your Admin to assign your role and section in the workspace — once they do, sign in again.</p>
+   <button class="secondary" onclick="cloudLogout()">Back to sign in</button>
+  </div>
+ </div>
+</section>
+
+<section id="app" class="hidden">
+ <aside class="sidebar" id="sidebar">
+  <div class="sideLogo">◈ AI Campus OS</div>
+  <nav class="nav" id="nav"></nav>
+  <div class="userSide"><div class="profile"><div class="avatar" id="sideAvatar">A</div><div><b id="sideName">User</b><small id="sideRole">Student</small><button class="secondary small" onclick="render('profile')">Profile</button></div></div></div>
+ </aside>
+ <main class="main">
+  <header class="top"><div class="topRight"><button class="secondary small mobileMenu" onclick="toggleSide()">☰</button><h2 id="pageTitle">Dashboard</h2></div><div class="topRight"><button class="secondary small bell" onclick="render('notifications')">♢<i id="notifCount"></i></button><button class="danger small" onclick="logout()">Logout</button></div></header>
+  <div class="content" id="content"></div>
+ </main>
+</section>
+
+<div class="modal" id="modal"><div class="modalBox" id="modalBox"></div></div><div class="toast" id="toast"></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const KEY='AI_CAMPUS_OS_V40_DATA',SESSION='AI_CAMPUS_OS_V40_SESSION';
+let sections=['A','B','C','D','E'];
+const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const periods=['09:00 - 10:00','10:00 - 11:00','11:00 - 12:00','12:00 - 01:00','02:00 - 03:00','03:00 - 04:00'];
+const subjects=['Data Structures','Database Management','Computer Networks','Web Development','Operating Systems','Mathematics'];
+const seed={
+ users:{
+  admin:{name:'College Admin',role:'Admin',password:'admin123',department:'Administration',disabled:false},
+  teacher1:{name:'Aarav Sharma',role:'Teacher',password:'1234',department:'Computer Science',disabled:false},
+  teacher2:{name:'Neha Verma',role:'Teacher',password:'1234',department:'Computer Science',disabled:false},
+  student1:{name:'Rahul Singh',role:'Student',password:'1234',department:'Computer Science',section:'A',disabled:false},
+  student2:{name:'Priya Mehta',role:'Student',password:'1234',department:'Computer Science',section:'A',disabled:false},
+  student3:{name:'Karan Gupta',role:'Student',password:'1234',department:'Computer Science',section:'B',disabled:false}
+ },
+ assignments:[
+  {id:'a1',title:'Network Topology Assignment',subject:'Computer Networks',section:'A',date:'2026-09-10',lastDate:'2026-09-16',maxMarks:10,question:'Draw and explain three common network topologies.',teacher:'teacher1',attachment:null,submissions:{student1:{status:'Submitted',marks:8}}},
+  {id:'a2',title:'SQL Practice',subject:'Database Management',section:'B',date:'2026-09-11',lastDate:'2026-09-18',maxMarks:20,question:'Write five SQL queries using SELECT, JOIN and GROUP BY.',teacher:'teacher2',attachment:null,submissions:{}}
+ ],
+ results:[
+  {id:'r1',student:'student1',subject:'Computer Networks',section:'A',marks:8,max:10,teacher:'teacher1'},
+  {id:'r2',student:'student1',subject:'Mathematics',section:'A',marks:16,max:20,teacher:'teacher2'}
+ ],
+ attendance:[
+  {id:'at1',student:'student1',subject:'Computer Networks',date:'2026-09-11',status:'Present',teacher:'teacher1'},
+  {id:'at2',student:'student1',subject:'Mathematics',date:'2026-09-11',status:'Present',teacher:'teacher2'},
+  {id:'at3',student:'student1',subject:'Web Development',date:'2026-09-12',status:'Absent',teacher:'teacher1'}
+ ],
+ timetable:[
+  {id:'t1',day:'Monday',period:0,section:'A',subject:'Computer Networks',teacher:'teacher1',room:'Lab 2'},
+  {id:'t2',day:'Monday',period:1,section:'A',subject:'Mathematics',teacher:'teacher2',room:'Room 204'},
+  {id:'t3',day:'Tuesday',period:0,section:'A',subject:'Web Development',teacher:'teacher1',room:'Lab 1'},
+  {id:'t4',day:'Monday',period:0,section:'B',subject:'Database Management',teacher:'teacher2',room:'Room 201'}
+ ],
+ notices:[
+  {id:'n1',title:'Mid-Semester Examination',text:'Mid-semester exams begin from 21 September. Check your timetable.',target:'All',date:'2026-09-12'},
+  {id:'n2',title:'Section A Assignment',text:'Network Topology assignment last date is 16 September.',target:'Section A',date:'2026-09-12'}
+ ],
+ notifications:[]
+};
+let data=loadData(),currentUser=null,currentPage='dashboard';
+if(!data.labs)data.labs=[]; if(!data.labSessions)data.labSessions=[]; if(!data.labAttendance)data.labAttendance=[]; if(!data.notifications)data.notifications=[]; if(!data.notices)data.notices=[]; save();
+
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function loadData(){try{const x=JSON.parse(localStorage.getItem(KEY));return x&&x.users?x:clone(seed)}catch(e){return clone(seed)}}
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function esc(x){return String(x??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function uid(p){return p+Date.now()+Math.random().toString(16).slice(2)}
+function me(){return data.users[currentUser]||{}}
+function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+function openModal(html){document.getElementById('modalBox').innerHTML=html;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+function login(){
+ const u=document.getElementById('loginUser').value.trim().toLowerCase(),p=document.getElementById('loginPass').value;
+ const x=data.users[u];
+ if(!x||x.password!==p){document.getElementById('loginErr').textContent='Invalid username or password.';return}
+ if(x.disabled){document.getElementById('loginErr').textContent='This account is disabled. Contact Admin.';return}
+ currentUser=u;sessionStorage.setItem(SESSION,u);document.getElementById('loginErr').textContent='';showApp();render('dashboard');
+}
+document.getElementById('loginBtn').onclick=login;
+document.getElementById('loginPass').onkeydown=e=>{if(e.key==='Enter')login()};
+function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');updateUserUI();buildNav()}
+function logout(){sessionStorage.removeItem(SESSION);currentUser=null;document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');document.getElementById('loginPass').value='';document.getElementById('loginErr').textContent='';location.hash='';}
+function toggleSide(){document.getElementById('sidebar').classList.toggle('open')}
+function updateUserUI(){const u=me();document.getElementById('sideName').textContent=u.name||currentUser;document.getElementById('sideRole').textContent=u.role+(u.section?' • Section '+u.section:'');document.getElementById('sideAvatar').textContent=(u.name||currentUser).slice(0,1).toUpperCase();updateNotif()}
+function buildNav(){
+ const common=[['dashboard','⌂','Dashboard'],['academic','▣','Academic Record'],['timetable','◫','Timetable'],['assignments','□','Assignments'],['marks','◆','Marks & Results'],['attendance','✓','Attendance'],['labs','⚗','Labs'],['notifications','♢','Notifications'],['directory','◎','Directory'],['profile','●','Profile']];
+ const teacher=[['classes','▤','My Classes']];
+ const admin=[['admin','⚙','Admin Control'],['workspace','☁','Workspace & Drive']];
+ const studentCommon=common.filter(x=>x[0]!=='directory'); const arr=me().role==='Admin'?common.concat(teacher,admin):me().role==='Teacher'?common.concat(teacher):studentCommon;
+ document.getElementById('nav').innerHTML=arr.map(x=>`<button data-p="${x[0]}" onclick="render('${x[0]}')">${x[1]} &nbsp; ${x[2]}</button>`).join('');
+}
+function updateNotif(){const n=visibleNotifications().filter(x=>!x.read).length;document.getElementById('notifCount').textContent=n?n>9?'9+':n:''}
+function visibleNotifications(){return data.notifications.filter(n=>n.target==='All'||n.target===currentUser||n.target==='Section '+(me().section||''))}
+function notify(target,title,text,type='info'){data.notifications.push({id:uid('n'),target,title,text,type,date:new Date().toLocaleString(),read:false});save();updateNotif()}
+function render(p){
+ currentPage=p;location.hash=p;document.getElementById('sidebar').classList.remove('open');
+ const allowed=['dashboard','academic','timetable','assignments','marks','attendance','labs','notifications','directory','profile','classes','admin','workspace'];
+ if(!allowed.includes(p))p='dashboard';
+ if((p==='admin'||p==='classes')&&me().role==='Student')p='dashboard';
+ const pages={dashboard:dashboard,academic:academic,timetable:timetablePage,assignments:assignmentPage,marks:marksPage,attendance:attendancePage,labs:labsPage,notifications:notificationPage,directory:directoryPage,profile:profilePage,classes:classesPage,admin:adminPage,workspace:workspacePage};
+ document.getElementById('pageTitle').textContent=p==='academic'?'Academic Record':p.charAt(0).toUpperCase()+p.slice(1);
+ document.getElementById('content').innerHTML=pages[p]();document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.p===p));updateUserUI();
+}
+window.addEventListener('hashchange',()=>{if(currentUser)render(location.hash.slice(1)||'dashboard')});
+window.addEventListener('popstate',()=>{if(currentUser)render(location.hash.slice(1)||'dashboard')});
+const metric=(v,l)=>`<div class="metric"><b>${esc(v)}</b><span>${esc(l)}</span></div>`;
+function dashboard(){
+ const u=me();
+ if(u.role==='Student'){
+  const aa=data.attendance.filter(x=>x.student===currentUser),ap=aa.filter(x=>x.status==='Present').length,att=aa.length?Math.round(ap/aa.length*100):0;
+  const as=data.assignments.filter(x=>x.section===u.section),sub=as.filter(a=>a.submissions?.[currentUser]?.status==='Submitted').length;
+  const rs=data.results.filter(x=>x.student===currentUser),tm=rs.reduce((a,x)=>a+x.marks,0),mx=rs.reduce((a,x)=>a+x.max,0);
+  return `<div class="hero"><div><span class="badge" style="background:#817cff;color:#fff">Student • Section ${esc(u.section)}</span><h1>Welcome, ${esc(u.name)} 👋</h1><p>Your academic dashboard, assignments and results are all in one place.</p></div><button class="primary" onclick="render('academic')">Open Academic Record</button></div><div class="metrics">${metric(att+'%','Attendance')}${metric(sub+'/'+as.length,'Assignments Submitted')}${metric(tm+'/'+(mx||0),'Marks')}${metric(mx?Math.round(tm/mx*100)+'%':'—','Overall Percentage')}</div><div class="grid2"><div class="card">${noticeMini('Latest Notices')}</div><div class="card">${assignmentMini(as,'Upcoming Assignments')}</div></div>`;
+ }
+ if(u.role==='Teacher'){
+  const maps=data.timetable.filter(x=>x.teacher===currentUser),as=data.assignments.filter(x=>x.teacher===currentUser),students=Object.values(data.users).filter(x=>x.role==='Student');
+  return `<div class="hero"><div><span class="badge" style="background:#817cff;color:#fff">Teacher</span><h1>Hello, ${esc(u.name)} 👋</h1><p>Manage attendance, physical assignments, marks and timetable.</p></div><button class="primary" onclick="openAssignment()">＋ New Assignment</button></div><div class="metrics">${metric(new Set(maps.map(x=>x.subject)).size,'Subjects')}${metric(new Set(maps.map(x=>x.section)).size,'Sections')}${metric(as.length,'Assignments')}${metric(students.length,'Students')}</div><div class="grid2"><div class="card">${assignmentMini(as,'My Assignments')}</div><div class="card">${noticeMini('Campus Notices')}</div></div>`;
+ }
+ return `<div class="hero"><div><span class="badge" style="background:#817cff;color:#fff">Admin</span><h1>Campus Control Center</h1><p>Manage users, academic records and the complete college setup.</p></div><button class="primary" onclick="render('admin')">Open Admin Control</button></div><div class="metrics">${metric(Object.values(data.users).filter(x=>x.role==='Student').length,'Students')}${metric(Object.values(data.users).filter(x=>x.role==='Teacher').length,'Teachers')}${metric(sections.length,'Sections')}${metric(data.assignments.length,'Assignments')}</div><div class="grid2"><div class="card">${noticeMini('Campus Notices')}</div><div class="card">${assignmentMini(data.assignments,'Recent Assignments')}</div></div>`;
+}
+function noticeMini(title){const ns=data.notices.slice(-4).reverse();return `<div class="title"><h3>${title}</h3><button class="secondary small" onclick="render('notifications')">View all</button></div><div class="list" style="margin-top:10px">${ns.map(n=>`<div class="row"><div><b>${esc(n.title)}</b><small>${esc(n.text)}</small></div><span class="badge purple">${esc(n.target)}</span></div>`).join('')||'<div class="empty">No notices.</div>'}</div>`}
+function assignmentMini(list,title){return `<div class="title"><h3>${title}</h3><button class="secondary small" onclick="render('assignments')">View all</button></div><div class="list" style="margin-top:10px">${list.slice(-4).reverse().map(a=>`<div class="row"><div><b>${esc(a.title)}</b><small>${esc(a.subject)} • Last date ${esc(a.lastDate)}</small></div><span class="badge purple">${esc(a.section)}</span></div>`).join('')||'<div class="empty">No assignments.</div>'}</div>`}
+
+function academic(){
+ if(me().role!=='Student')return `<div class="card"><div class="empty">Academic Record is available in detail for students. Teachers and Admin can manage the underlying attendance, assignments and marks.</div></div>`;
+ const u=me(),aa=data.attendance.filter(x=>x.student===currentUser),ap=aa.filter(x=>x.status==='Present').length,att=aa.length?Math.round(ap/aa.length*100):0;
+ const as=data.assignments.filter(x=>x.section===u.section),sub=as.filter(a=>a.submissions?.[currentUser]?.status==='Submitted').length,rs=data.results.filter(x=>x.student===currentUser),tm=rs.reduce((a,x)=>a+x.marks,0),mx=rs.reduce((a,x)=>a+x.max,0),pct=mx?Math.round(tm/mx*100):0;
+ const subs=[...new Set([...aa.map(x=>x.subject),...rs.map(x=>x.subject),...as.map(x=>x.subject)])];
+ return `<div class="card"><div class="profile"><div class="avatar">${esc(u.name.slice(0,1))}</div><div><h3 style="margin:0">${esc(u.name)}</h3><div class="muted">Section ${esc(u.section)} • ${esc(u.department)}</div></div></div></div><div class="metrics">${metric(att+'%','Attendance')}${metric(sub+'/'+as.length,'Assignments')}${metric(tm+'/'+(mx||0),'Marks')}${metric(pct+'%','Overall')}</div><div class="card"><div class="title"><h3>Subject-wise Summary</h3><span class="badge purple">Live</span></div><div class="tableWrap"><table class="table"><thead><tr><th>Subject</th><th>Attendance</th><th>Marks</th><th>Assignments</th></tr></thead><tbody>${subs.map(s=>{const a=aa.filter(x=>x.subject===s),p=a.filter(x=>x.status==='Present').length,ap=a.length?Math.round(p/a.length*100):null,m=rs.filter(x=>x.subject===s),mm=m.reduce((z,x)=>z+x.marks,0),mx2=m.reduce((z,x)=>z+x.max,0),mp=mx2?Math.round(mm/mx2*100):null,ax=as.filter(x=>x.subject===s),done=ax.filter(x=>x.submissions?.[currentUser]?.status==='Submitted').length;return `<tr><td><b>${esc(s)}</b></td><td>${ap==null?'—':ap+'%'}</td><td>${mp==null?'—':mm+'/'+mx2+' ('+mp+'%)'}</td><td>${ax.length?done+'/'+ax.length:'—'}</td></tr>`}).join('')}</tbody></table></div></div>`;
+}
+
+
+function openTimetableFileUpload(){
+ if(me().role==='Student')return;
+ const hint=driveConnected()?'Connected to Google Drive — this file will upload to your Drive folder (no size limit here).':'Google Drive not connected. File stays in this browser only, max 5 MB. Connect Drive from the Workspace page for shared, larger uploads.';
+ openModal(`<h3>Upload Timetable</h3>
+ <div class="field"><label>Title</label><input id="ttTitle" placeholder="Weekly Timetable"></div>
+ <div class="field"><label>PDF / Image</label><div class="fileBox"><input id="ttFile" type="file" accept="application/pdf,image/*"><small>${hint}</small></div></div>
+ <div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTimetableFile()">Upload</button></div>`);
+}
+async function saveTimetableFile(){
+ const f=document.getElementById('ttFile')?.files?.[0];
+ const title=document.getElementById('ttTitle')?.value.trim()||'Timetable';
+ if(!f)return alert('Please select a PDF or image.');
+ let up;
+ try{ up=await handleUpload(f,{maxLocalMB:5}); }
+ catch(e){ return alert('File must be 5 MB or smaller, or connect Google Drive for larger files.'); }
+ data.timetableFiles=data.timetableFiles||[];
+ data.timetableFiles.push({id:uid('ttf'),title,type:up.type,name:up.name,data:up.data,driveLink:up.driveLink,uploadedBy:currentUser,date:new Date().toISOString().slice(0,10)});
+ save();closeModal();render('timetable');toast(up.driveLink?'Timetable uploaded to Google Drive ✓':'Timetable uploaded ✓');
+}
+function deleteTimetableFile(id){if(confirm('Delete this uploaded timetable file?')){data.timetableFiles=(data.timetableFiles||[]).filter(x=>x.id!==id);save();render('timetable');toast('File removed')}}
+
+function timetablePage(){
+ const u=me(),rows=data.timetable.filter(x=>u.role==='Admin'||u.role==='Teacher'?u.role==='Teacher'?x.teacher===currentUser:true:x.section===u.section);
+ const files=(data.timetableFiles||[]).slice().reverse();
+ const filesHtml=`<div class="card" style="margin-top:12px"><div class="title"><h3>Uploaded Timetable Files</h3></div><div class="grid2" style="margin-top:12px">${files.map(f=>`<div>${attachmentHtml(f,'openTimetableFile',f.id)}${u.role!=='Student'?`<button class="danger small" style="margin-top:6px" onclick="deleteTimetableFile('${f.id}')">Delete</button>`:''}</div>`).join('')||'<div class="empty">No timetable files uploaded yet.</div>'}</div></div>`;
+ return `<div class="card"><div class="title"><div><h3>${u.role==='Admin'?'Complete Timetable':u.role==='Teacher'?'My Teaching Timetable':'My Section Timetable'}</h3><div class="muted">${u.role==='Student'?'Section '+esc(u.section):'Manage or view classes'}</div></div>${u.role!=='Student'?'<div class="actions"><button class="secondary small" onclick="openTimetableFileUpload()">＋ Upload PDF/Image</button><button class="primary small" onclick="openTimetable()">＋ Add Class</button></div>':''}</div><div class="tableWrap" style="margin-top:12px"><table class="table"><thead><tr><th>Day</th><th>Period</th><th>Section</th><th>Subject</th><th>Teacher</th><th>Room</th>${u.role!=='Student'?'<th></th>':''}</tr></thead><tbody>${rows.map(r=>`<tr><td>${r.day}</td><td>${periods[r.period]||r.period}</td><td>${r.section}</td><td>${esc(r.subject)}</td><td>${esc(data.users[r.teacher]?.name||r.teacher)}</td><td>${esc(r.room||'—')}</td>${u.role!=='Student'?`<td><button class="danger small" onclick="deleteTimetable('${r.id}')">Delete</button></td>`:''}</tr>`).join('')||'<tr><td colspan="7" class="empty">No timetable entries.</td></tr>'}</tbody></table></div></div>${filesHtml}`;
+}
+function openTimetableFile(id){const f=(data.timetableFiles||[]).find(x=>x.id===id);if(!f)return;if(f.data){const a=document.createElement('a');a.href=f.data;a.target='_blank';a.download=f.name;a.click()}else if(f.driveLink)window.open(f.driveLink,'_blank')}
+function openTimetable(){
+ const teachers=Object.entries(data.users).filter(([k,u])=>u.role==='Teacher');
+ openModal(`<h3>Add Timetable Class</h3><div class="formGrid"><div class="field"><label>Day</label><select id="td">${days.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Period</label><select id="tp">${periods.map((x,i)=>`<option value="${i}">${x}</option>`).join('')}</select></div><div class="field"><label>Section</label><select id="ts">${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Subject</label><select id="tSub">${subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div><div class="field"><label>Teacher</label><select id="tt">${teachers.map(([k,u])=>`<option value="${k}">${esc(u.name)}</option>`).join('')}</select></div><div class="field"><label>Room</label><input id="tr" placeholder="Room / Lab"></div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveTimetable()">Save</button></div>`);
+}
+function saveTimetable(){data.timetable.push({id:uid('t'),day:document.getElementById('td').value,period:+document.getElementById('tp').value,section:document.getElementById('ts').value,subject:document.getElementById('tSub').value,teacher:document.getElementById('tt').value,room:document.getElementById('tr').value});save();closeModal();render('timetable');toast('Timetable updated ✓')}
+function deleteTimetable(id){if(confirm('Delete this timetable entry?')){data.timetable=data.timetable.filter(x=>x.id!==id);save();render('timetable');}}
+
+function assignmentPage(){
+ const u=me(),list=data.assignments.filter(a=>u.role==='Admin'||u.role==='Teacher'&&a.teacher===currentUser||u.role==='Student'&&a.section===u.section);
+ return `<div class="card"><div class="title"><div><h3>${u.role==='Student'?'My Assignments':'Assignment Center'}</h3><div class="muted">${u.role==='Student'?'Physical submission is recorded by your teacher.':'Create, track and grade assignments.'}</div></div>${u.role!=='Student'?'<button class="primary small" onclick="openAssignment()">＋ Create Assignment</button>':''}</div><div class="list" style="margin-top:12px">${list.slice().reverse().map(a=>{const r=a.submissions?.[currentUser]||{};const done=Object.values(a.submissions||{}).filter(x=>x.status==='Submitted').length;const students=Object.values(data.users).filter(x=>x.role==='Student'&&x.section===a.section).length;return `<div class="row"><div style="flex:1"><span class="badge purple">${esc(a.subject)}</span><h4 style="margin:7px 0 4px">${esc(a.title)}</h4><small>${esc(a.question||'Attachment: '+(a.attachment?.name||'file'))}</small><small>Section ${esc(a.section)} • ${esc(a.date)} → ${esc(a.lastDate)} • Max ${a.maxMarks}</small>${a.attachment?`<div><button class="secondary small" onclick="downloadAttachment('${a.id}')">Open ${esc(a.attachment.name)}</button></div>`:''}</div><div class="actions">${u.role==='Student'?`<span class="badge ${r.status==='Submitted'?'green':'orange'}">${r.status||'Not Submitted'}</span>${r.marks!=null?`<b>${r.marks}/${a.maxMarks}</b>`:'<small>Marks pending</small>'}`:`<span class="badge purple">${done}/${students} submitted</span><button class="secondary small" onclick="trackAssignment('${a.id}')">Track</button><button class="danger small" onclick="deleteAssignment('${a.id}')">Delete</button>`}</div></div>`}).join('')||'<div class="empty">No assignments found.</div>'}</div></div>`;
+}
+function openAssignment(){
+ const teachers=Object.entries(data.users).filter(([k,u])=>u.role==='Teacher');
+ const teacherCurrent=me().role==='Teacher';
+ const hint=driveConnected()?'Connected to Google Drive — larger files upload straight to your Drive folder.':'Google Drive not connected. File stays in this browser only, max 2 MB.';
+ openModal(`<h3>Create Assignment</h3><div class="formGrid"><div class="field"><label>Title</label><input id="atitle" placeholder="Assignment title"></div><div class="field"><label>Subject</label><select id="asub">${subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div><div class="field"><label>Section</label><select id="asec">${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Assignment Date</label><input id="adate" type="date"></div><div class="field"><label>Last Submission Date</label><input id="alast" type="date"></div><div class="field"><label>Maximum Marks</label><input id="amax" type="number" min="1" value="10"></div><div class="field full"><label>Question / Instructions</label><textarea id="aq" rows="4" placeholder="Type question here..."></textarea></div><div class="field full"><label>Photo / PDF (optional)</label><div class="fileBox"><input id="afile" type="file" accept="application/pdf,image/*"><small>${hint}</small></div></div>${!teacherCurrent?`<div class="field"><label>Teacher</label><select id="ateacher">${teachers.map(([k,u])=>`<option value="${k}">${esc(u.name)}</option>`).join('')}</select></div>`:''}</div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAssignment()">Create</button></div>`);
+ const today=new Date().toISOString().slice(0,10);document.getElementById('adate').value=today;document.getElementById('alast').value=today;
+}
+async function saveAssignment(){
+ const title=document.getElementById('atitle').value.trim(),date=document.getElementById('adate').value,last=document.getElementById('alast').value,max=+document.getElementById('amax').value,q=document.getElementById('aq').value.trim(),f=document.getElementById('afile').files[0],teacher=me().role==='Teacher'?currentUser:document.getElementById('ateacher').value;
+ if(!title||!date||!last||!max||(!q&&!f))return alert('Add title, dates, maximum marks and a question or file.');
+ if(last<date)return alert('Last date cannot be before assignment date.');
+ let attachment=null;
+ if(f){
+  try{ attachment=await handleUpload(f,{maxLocalMB:2}); }
+  catch(e){ return alert('File must be 2 MB or smaller, or connect Google Drive for larger files.'); }
+ }
+ data.assignments.push({id:uid('a'),title,subject:document.getElementById('asub').value,section:document.getElementById('asec').value,date,lastDate:last,maxMarks:max,question:q,teacher,attachment,submissions:{}});save();closeModal();render('assignments');notify('Section '+document.getElementById('asec').value,'New assignment',title,'info');toast('Assignment created ✓');
+}
+function downloadAttachment(id){const a=data.assignments.find(x=>x.id===id);if(!a?.attachment)return alert('No attachment available.');if(a.attachment.data){const link=document.createElement('a');link.href=a.attachment.data;link.download=a.attachment.name;link.target='_blank';link.click()}else if(a.attachment.driveLink){window.open(a.attachment.driveLink,'_blank')}else alert('No attachment available.')}
+function trackAssignment(id){
+ const a=data.assignments.find(x=>x.id===id);if(!a)return;
+ const st=Object.entries(data.users).filter(([k,u])=>u.role==='Student'&&u.section===a.section);
+ openModal(`<h3>${esc(a.title)} — Physical Submission</h3><div class="muted">Teacher records submission after the student physically submits the assignment.</div><div class="list" style="margin-top:12px">${st.map(([k,u])=>{const r=a.submissions?.[k]||{};return `<div class="row"><div><b>${esc(u.name)}</b><small>${esc(k)} • Section ${esc(u.section)}</small></div><div class="actions"><button class="statusBtn ${r.status==='Submitted'?'on':''}" onclick="setSubmission('${a.id}','${k}','Submitted')">Submitted</button><button class="statusBtn ${r.status!=='Submitted'?'on':''}" onclick="setSubmission('${a.id}','${k}','Pending')">Pending</button><input id="m_${k}" style="width:55px;padding:6px;border:1px solid var(--line);border-radius:7px" type="number" min="0" max="${a.maxMarks}" value="${r.marks??''}" placeholder="Marks" onchange="setMarks('${a.id}','${k}',this.value)"></div></div>`}).join('')||'<div class="empty">No students in this section.</div>'}</div><div class="modalActions"><button class="primary" onclick="closeModal()">Done</button></div>`);
+}
+function setSubmission(aid,student,status){const a=data.assignments.find(x=>x.id===aid);a.submissions=a.submissions||{};a.submissions[student]=a.submissions[student]||{};a.submissions[student].status=status;save();notify(student,'Assignment status updated',`${a.title}: ${status}`,'success');trackAssignment(aid);updateNotif();toast(status==='Submitted'?'Marked submitted ✓':'Marked pending')}
+function setMarks(aid,student,v){const a=data.assignments.find(x=>x.id===aid),n=Number(v);if(v===''||n<0||n>a.maxMarks)return alert('Enter marks from 0 to '+a.maxMarks);a.submissions=a.submissions||{};a.submissions[student]=a.submissions[student]||{status:'Pending'};a.submissions[student].marks=n;save();notify(student,'Marks updated',`${a.title}: ${n}/${a.maxMarks}`,'success');toast('Marks updated ✓')}
+function deleteAssignment(id){if(confirm('Delete assignment?')){data.assignments=data.assignments.filter(a=>a.id!==id);save();render('assignments');toast('Assignment deleted')}}
+
+function marksPage(){
+ const u=me();
+ if(u.role==='Student'){const rs=data.results.filter(x=>x.student===currentUser),tm=rs.reduce((a,x)=>a+x.marks,0),mx=rs.reduce((a,x)=>a+x.max,0),pct=mx?Math.round(tm/mx*100):0;return `<div class="card"><div class="title"><div><h3>My Results</h3><div class="muted">Teacher-updated marks</div></div><span class="badge ${pct>=40?'green':'orange'}">${pct>=40?'Pass':'Needs Improvement'}</span></div><div class="metrics">${metric(tm+'/'+(mx||0),'Total Marks')}${metric(pct+'%','Percentage')}${metric(rs.length,'Subjects')}${metric(pct>=40?'Pass':'Pending Improvement','Status')}</div><div class="tableWrap"><table class="table"><thead><tr><th>Subject</th><th>Marks</th><th>Maximum</th><th>Percentage</th></tr></thead><tbody>${rs.map(r=>`<tr><td>${esc(r.subject)}</td><td>${r.marks}</td><td>${r.max}</td><td>${Math.round(r.marks/r.max*100)}%</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Marks will appear after teacher updates them.</td></tr>'}</tbody></table></div></div>`}
+ const list=data.results.filter(r=>u.role==='Admin'||r.teacher===currentUser);
+ return `<div class="card"><div class="title"><div><h3>Marks & Results Center</h3><div class="muted">Teacher decides maximum marks and updates checked assignments.</div></div><button class="primary small" onclick="openResult()">＋ Enter Marks</button></div><div class="tableWrap" style="margin-top:12px"><table class="table"><thead><tr><th>Student</th><th>Section</th><th>Subject</th><th>Marks</th><th>Max</th><th></th></tr></thead><tbody>${list.slice().reverse().map(r=>`<tr><td>${esc(data.users[r.student]?.name||r.student)}</td><td>${esc(r.section)}</td><td>${esc(r.subject)}</td><td>${r.marks}</td><td>${r.max}</td><td><button class="danger small" onclick="deleteResult('${r.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No marks entered.</td></tr>'}</tbody></table></div></div>`;
+}
+function openResult(){
+ const students=Object.entries(data.users).filter(([k,u])=>u.role==='Student'),teachers=Object.entries(data.users).filter(([k,u])=>u.role==='Teacher');
+ openModal(`<h3>Enter / Update Marks</h3><div class="formGrid"><div class="field"><label>Student</label><select id="rs">${students.map(([k,u])=>`<option value="${k}">${esc(u.name)} — ${u.section}</option>`).join('')}</select></div><div class="field"><label>Subject</label><select id="rsub">${subjects.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div><div class="field"><label>Maximum Marks</label><input id="rmax" type="number" min="1" value="10"></div><div class="field"><label>Marks Obtained</label><input id="rm" type="number" min="0" value="0"></div>${me().role==='Admin'?`<div class="field"><label>Teacher</label><select id="rt">${teachers.map(([k,u])=>`<option value="${k}">${esc(u.name)}</option>`).join('')}</select></div>`:''}</div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveResult()">Save Marks</button></div>`);
+}
+function saveResult(){const st=document.getElementById('rs').value,sub=document.getElementById('rsub').value,max=+document.getElementById('rmax').value,m=+document.getElementById('rm').value;if(!max||m<0||m>max)return alert('Marks must be between 0 and maximum marks.');const u=data.users[st],teacher=me().role==='Teacher'?currentUser:document.getElementById('rt').value;let r=data.results.find(x=>x.student===st&&x.subject===sub);if(r){r.max=max;r.marks=m;r.teacher=teacher;r.section=u.section}else data.results.push({id:uid('r'),student:st,subject:sub,section:u.section,max,marks:m,teacher});save();closeModal();render('marks');notify(st,'Marks updated',`${sub}: ${m}/${max}`,'success');toast('Marks saved ✓')}
+function deleteResult(id){if(confirm('Delete marks record?')){data.results=data.results.filter(x=>x.id!==id);save();render('marks')}}
+
+function attendancePage(){
+ const u=me();
+ if(u.role==='Student'){
+  const list=data.attendance.filter(x=>x.student===currentUser);
+  const held=list.filter(x=>!['No Class','Holiday'].includes(x.status));
+  const present=held.filter(x=>x.status==='Present').length;
+  const absent=held.filter(x=>x.status==='Absent').length;
+  const leave=held.filter(x=>x.status==='Leave').length;
+  const overall=held.length?Math.round(present/held.length*100):0;
+  const bySubject={};
+  list.forEach(x=>{
+    const s=x.subject||'Other';
+    if(!bySubject[s])bySubject[s]=[];
+    bySubject[s].push(x);
+  });
+  return `<div class="card">
+    <div class="title">
+      <div><h3>My Attendance</h3><div class="muted">Select a subject to view only that subject's attendance.</div></div>
+      <span class="badge ${overall>=75?'green':'orange'}">${overall}%</span>
+    </div>
+    <div class="metrics">${metric(overall+'%','Overall')}${metric(present,'Present')}${metric(absent,'Absent')}${metric(leave,'Leave')}</div>
+  </div>
+  <div class="grid2" style="margin-top:12px">
+    ${Object.entries(bySubject).map(([subject,rows])=>{
+      const h=rows.filter(x=>!['No Class','Holiday'].includes(x.status));
+      const p=h.filter(x=>x.status==='Present').length;
+      const a=h.filter(x=>x.status==='Absent').length;
+      const l=h.filter(x=>x.status==='Leave').length;
+      const q=h.length?Math.round(p/h.length*100):0;
+      return `<div class="card subjectAttendanceCard">
+        <div class="title"><div><h3>${esc(subject)}</h3><div class="muted">${h.length} held • ${p} Present • ${a} Absent • ${l} Leave</div></div><span class="badge ${q>=75?'green':'orange'}">${q}%</span></div>
+        <button class="secondary small" data-student-subject="${esc(subject)}">View Attendance</button>
+      </div>`;
+    }).join('')||'<div class="card"><div class="empty">No subject-wise attendance records yet.</div></div>'}
+  </div>`;
+ }
+ const groups={};
+ data.attendance.forEach(x=>{const key=[x.section||data.users[x.student]?.section||'',x.date,x.periodNo||'',x.lectureNo||'',x.subject||'',x.teacher||''].join('|');if(!groups[key])groups[key]=[];groups[key].push(x)});
+ const sessions=Object.entries(groups).sort((a,b)=>String(b[1][0].date).localeCompare(String(a[1][0].date)));
+ return `<div class="card"><div class="title"><div><h3>Attendance Register</h3><div class="muted">Each class is shown as one register. Open a register to see students.</div></div><button class="primary small" onclick="openAttendanceRegister()">＋ Open Register</button></div><div class="sessionGrid" style="margin-top:14px">${sessions.map(([key,rows])=>{const x=rows[0],present=rows.filter(r=>r.status==='Present').length,absent=rows.filter(r=>r.status==='Absent').length,leave=rows.filter(r=>r.status==='Leave').length,nc=rows.filter(r=>['No Class','Holiday'].includes(r.status)).length;return `<div class="sessionCard"><div class="sessionTop"><div><span class="badge purple">Section ${esc(x.section||data.users[x.student]?.section||'—')}</span><h3>${esc(x.subject||'—')}</h3><div class="muted">${esc(x.date)} • Period ${esc(x.periodNo||'—')} • Lecture ${esc(x.lectureNo||'—')}</div></div><button class="secondary small" data-view-attendance="${esc(JSON.stringify({section:x.section||data.users[x.student]?.section||'',date:x.date||'',periodNo:x.periodNo||'',lectureNo:x.lectureNo||'',subject:x.subject||'',teacher:x.teacher||''}))}" onclick="viewAttendanceSession(${JSON.stringify(x.section||data.users[x.student]?.section||'')},${JSON.stringify(x.date||'')},${JSON.stringify(x.periodNo||'')},${JSON.stringify(x.lectureNo||'')},${JSON.stringify(x.subject||'')},${JSON.stringify(x.teacher||'')})">View Students</button></div><div class="sessionStats"><span class="badge green">Present ${present}</span><span class="badge red">Absent ${absent}</span><span class="badge orange">Leave ${leave}</span>${nc?`<span class="badge purple">No Class ${nc}</span>`:''}<span class="muted">${rows.length} students</span></div></div>`}).join('')||'<div class="empty">No attendance registers saved yet.</div>'}</div></div>`;
+}
+
+function viewStudentSubjectAttendance(subject){
+ const rows=data.attendance.filter(x=>x.student===currentUser && (x.subject||'Other')===subject)
+   .sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ if(!rows.length){ return openModal(`<div class="title"><div><h3>${esc(subject)}</h3><div class="muted">No attendance records found for this subject.</div></div></div><div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`); }
+ const held=rows.filter(x=>!['No Class','Holiday'].includes(x.status));
+ const p=held.filter(x=>x.status==='Present').length;
+ const a=held.filter(x=>x.status==='Absent').length;
+ const l=held.filter(x=>x.status==='Leave').length;
+ const pct=held.length?Math.round(p/held.length*100):0;
+ openModal(`<div class="title"><div><h3>${esc(subject)}</h3><div class="muted">My subject-wise attendance</div></div><span class="badge ${pct>=75?'green':'orange'}">${pct}%</span></div>
+   <div class="metrics">${metric(p,'Present')}${metric(a,'Absent')}${metric(l,'Leave')}${metric(held.length,'Held')}</div>
+   <div class="tableWrap" style="margin-top:12px"><table class="table"><thead><tr><th>Date</th><th>Period</th><th>Lecture</th><th>Status</th></tr></thead><tbody>
+   ${rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.periodNo||'—')}</td><td>${esc(x.lectureNo||'—')}</td><td><span class="badge ${x.status==='Present'?'green':x.status==='Leave'?'orange':x.status==='Absent'?'red':'purple'}">${esc(x.status)}</span></td></tr>`).join('')}
+   </tbody></table></div><div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`);
+}
+
+function viewAttendanceSession(section,date,periodNo,lectureNo,subject,teacher){
+ const norm=v=>String(v??'').trim();
+ let rows=data.attendance.filter(x=>
+   norm(x.section||data.users?.[x.student]?.section)===norm(section) &&
+   norm(x.date)===norm(date) &&
+   norm(x.periodNo)===norm(periodNo) &&
+   norm(x.lectureNo)===norm(lectureNo) &&
+   norm(x.subject)===norm(subject)
+ );
+ if(!rows.length){
+   rows=data.attendance.filter(x=>norm(x.date)===norm(date)&&norm(x.periodNo)===norm(periodNo)&&norm(x.lectureNo)===norm(lectureNo)&&norm(x.subject)===norm(subject));
+ }
+ if(!rows.length){
+   return openModal(`<div class="title"><div><h3>${esc(subject||'Attendance')}</h3><div class="muted">No student records were found for this register.</div></div></div><div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`);
+ }
+ const x=rows[0];
+ openModal(`<div class="title"><div><h3>${esc(x.subject||'Attendance')}</h3><div class="muted">Section ${esc(x.section||section||'—')} • ${esc(x.date)} • Period ${esc(x.periodNo||'—')} • Lecture ${esc(x.lectureNo||'—')}</div></div></div>
+ <div class="toolbar"><span class="badge green">Present ${rows.filter(r=>r.status==='Present').length}</span><span class="badge red">Absent ${rows.filter(r=>r.status==='Absent').length}</span><span class="badge orange">Leave ${rows.filter(r=>r.status==='Leave').length}</span><span class="muted">${rows.length} students</span></div>
+ <div class="list" style="margin-top:12px;max-height:52vh;overflow:auto">${rows.map(r=>`<div class="row"><div><b>${esc(data.users?.[r.student]?.name||r.student||'Student')}</b><small>Roll/ID: ${esc(data.users?.[r.student]?.roll||r.student||'—')}</small></div><span class="badge ${r.status==='Present'?'green':r.status==='Leave'?'orange':r.status==='Absent'?'red':'purple'}">${esc(r.status)}</span></div>`).join('')}</div>
+ <div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`);
+}
+function openAttendanceRegister(){
+ const subs=me().role==='Teacher'?[...new Set(data.timetable.filter(x=>x.teacher===currentUser).map(x=>x.subject))]:subjects;
+ openModal(`<h3>Attendance Register</h3><div class="formGrid"><div class="field"><label>Section</label><select id="arSec">${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Date</label><input id="arDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Period Number</label><input id="arPeriod" type="number" min="1" max="12" value="1"></div><div class="field"><label>Lecture Number</label><input id="arLecture" type="number" min="1" max="20" value="1"></div><div class="field full"><label>Subject</label><select id="arSub">${subs.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div></div><div class="toolbar"><button class="secondary small" onclick="loadAttendanceStudents()">Load Students</button><button class="secondary small" onclick="setRegisterAll('Present')">All Present</button><button class="secondary small" onclick="setRegisterAll('Absent')">All Absent</button><button class="secondary small" onclick="setRegisterAll('Leave')">All Leave</button><button class="secondary small" onclick="setRegisterAll('No Class')">No Class</button></div><div id="registerStudents" class="list"><div class="empty">Choose details and click Load Students.</div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveAttendanceRegister()">Save Register</button></div>`);
+}
+function registerStudents(){const sec=document.getElementById('arSec')?.value;return Object.entries(data.users).filter(([k,u])=>u.role==='Student'&&u.section===sec)}
+function loadAttendanceStudents(){const list=registerStudents();const date=document.getElementById('arDate').value,sub=document.getElementById('arSub').value,periodNo=document.getElementById('arPeriod').value,lectureNo=document.getElementById('arLecture').value;document.getElementById('registerStudents').innerHTML=list.map(([k,u])=>{const old=data.attendance.find(x=>x.student===k&&x.date===date&&String(x.periodNo)===String(periodNo)&&String(x.lectureNo)===String(lectureNo)&&x.subject===sub);const st=old?.status||'Present';return `<div class="row regRow" data-id="${esc(k)}" data-status="${esc(st)}"><div><b>${esc(u.name)}</b><small>${esc(k)} • Section ${esc(u.section)}</small></div><div class="actions"><button class="statusBtn ${st==='Present'?'on':''}" data-status="Present" onclick="setRegStatus(this,'Present')">Present</button><button class="statusBtn ${st==='Absent'?'on':''}" data-status="Absent" onclick="setRegStatus(this,'Absent')">Absent</button><button class="statusBtn ${st==='Leave'?'on':''}" data-status="Leave" onclick="setRegStatus(this,'Leave')">Leave</button><button class="statusBtn ${st==='No Class'?'on':''}" data-status="No Class" onclick="setRegStatus(this,'No Class')">No Class</button></div></div>`}).join('')||'<div class="empty">No students in this section.</div>';}
+function setRegStatus(btn,status){const row=btn.closest('.regRow');row.dataset.status=status;row.querySelectorAll('.statusBtn').forEach(b=>b.classList.toggle('on',b.dataset.status===status))}
+function setRegisterAll(status){document.querySelectorAll('.regRow').forEach(r=>{r.dataset.status=status;r.querySelectorAll('.statusBtn').forEach(b=>b.classList.toggle('on',b.dataset.status===status))})}
+function saveAttendanceRegister(){const sec=document.getElementById('arSec').value,date=document.getElementById('arDate').value,periodNo=document.getElementById('arPeriod').value,lectureNo=document.getElementById('arLecture').value,sub=document.getElementById('arSub').value,rows=[...document.querySelectorAll('.regRow')];if(!rows.length)return alert('Load students first.');rows.forEach(row=>{const st=row.dataset.id,status=row.dataset.status||'Present';let x=data.attendance.find(x=>x.student===st&&x.date===date&&String(x.periodNo)===String(periodNo)&&String(x.lectureNo)===String(lectureNo)&&x.subject===sub);if(x)x.status=status;else data.attendance.push({id:uid('at'),student:st,subject:sub,date,periodNo,lectureNo,section:sec,status,teacher:currentUser})});save();closeModal();render('attendance');toast('Attendance register saved ✓');}
+function labsPage(){
+ const u=me();
+ if(u.role==='Student'){
+  const list=(data.labAttendance||[]).filter(x=>x.student===currentUser);
+  const byLab={};
+  list.forEach(x=>{
+    const lab=(data.labs||[]).find(l=>l.labId===x.labId);
+    const name=x.labName||lab?.labName||'Lab';
+    if(!byLab[name])byLab[name]=[];
+    byLab[name].push(x);
+  });
+  return `<div class="card"><div class="title"><div><h3>My Labs</h3><div class="muted">Select a lab to view only that lab's attendance.</div></div></div></div>
+  <div class="grid2" style="margin-top:12px">${Object.entries(byLab).map(([name,rows])=>{
+    const held=rows.filter(x=>!['No Class','Holiday'].includes(x.status));
+    const p=held.filter(x=>x.status==='Present').length;
+    const a=held.filter(x=>x.status==='Absent').length;
+    const l=held.filter(x=>x.status==='Leave').length;
+    const pct=held.length?Math.round(p/held.length*100):0;
+    return `<div class="card"><div class="title"><div><h3>${esc(name)}</h3><div class="muted">${held.length} sessions • ${p} Present • ${a} Absent • ${l} Leave</div></div><span class="badge ${pct>=75?'green':'orange'}">${pct}%</span></div><button class="secondary small" data-lab-name="${esc(name)}">View Lab Attendance</button></div>`;
+  }).join('')||'<div class="card"><div class="empty">No lab attendance records yet.</div></div>'}</div>`;
+ }
+ const labs=data.labs||[];
+ const sessions=(data.labSessions||[]).slice().reverse();
+ return `<div class="card"><div class="title"><div><h3>Lab Management</h3><div class="muted">Manage section/batch lab sessions and attendance.</div></div><div class="actions"><button class="secondary small" onclick="openLabSetup()">＋ Add Lab</button><button class="primary small" onclick="openLabRegister()">＋ Attendance Register</button></div></div><div class="grid2" style="margin-top:12px">${labs.map(l=>`<div class="card"><h3>${esc(l.labName)}</h3><div class="muted">${esc(l.labId||'')} • ${esc(l.mode||'')}</div></div>`).join('')||'<div class="empty">No labs configured. Click "Add Lab" to create one.</div>'}</div></div><div class="card"><div class="title"><h3>Recorded Lab Sessions</h3></div><div class="list" style="margin-top:12px">${sessions.map(s=>`<div class="row"><div><b>${esc(s.labName)}</b><small>${esc(s.date)} • Lab ${esc(s.labNumber)} • Experiment ${esc(s.experimentNo)} • Section ${esc(s.section)}${s.batch?' / '+esc(s.batch):''}</small></div><button class="secondary small" onclick="viewLabSession('${s.id}')">View</button></div>`).join('')||'<div class="empty">No lab attendance recorded yet.</div>'}</div></div>`;
+}
+
+function viewStudentLabAttendance(name){
+ const rows=(data.labAttendance||[]).filter(x=>{
+   const lab=(data.labs||[]).find(l=>l.labId===x.labId);
+   return x.student===currentUser && (x.labName||lab?.labName||'Lab')===name;
+ }).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+ if(!rows.length)return;
+ const held=rows.filter(x=>!['No Class','Holiday'].includes(x.status));
+ const p=held.filter(x=>x.status==='Present').length;
+ const a=held.filter(x=>x.status==='Absent').length;
+ const l=held.filter(x=>x.status==='Leave').length;
+ const pct=held.length?Math.round(p/held.length*100):0;
+ openModal(`<div class="title"><div><h3>${esc(name)}</h3><div class="muted">My lab-wise attendance</div></div><span class="badge ${pct>=75?'green':'orange'}">${pct}%</span></div>
+ <div class="metrics">${metric(p,'Present')}${metric(a,'Absent')}${metric(l,'Leave')}${metric(held.length,'Sessions')}</div>
+ <div class="tableWrap" style="margin-top:12px"><table class="table"><thead><tr><th>Date</th><th>Lab No.</th><th>Experiment</th><th>Section/Batch</th><th>Status</th></tr></thead><tbody>
+ ${rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.labNumber||'—')}</td><td>${esc(x.experimentNo||'—')}</td><td>${esc(x.section||'—')}${x.batch?' / '+esc(x.batch):''}</td><td><span class="badge ${x.status==='Present'?'green':x.status==='Leave'?'orange':x.status==='Absent'?'red':'purple'}">${esc(x.status)}</span></td></tr>`).join('')}
+ </tbody></table></div><div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`);
+}
+
+function viewLabSession(id){const x=data.labSessions.find(s=>s.id===id),rows=data.labAttendance.filter(r=>r.sessionId===id);if(!x)return;openModal(`<div class="title"><div><h3>${esc(x.labName)} (${esc(x.labId)})</h3><div class="muted">${esc(x.date)} • Lab ${esc(x.labNumber)} • Experiment ${esc(x.experimentNo)} • Section ${esc(x.section)} • ${esc(x.batch||'Whole Section')}</div></div></div><div class="toolbar"><span class="badge green">Present ${rows.filter(r=>r.status==='Present').length}</span><span class="badge red">Absent ${rows.filter(r=>r.status==='Absent').length}</span></div><div class="list" style="margin-top:12px;max-height:52vh;overflow:auto">${rows.map(r=>`<div class="row"><div><b>${esc(data.users[r.student]?.name||r.student)}</b><small>${esc(r.student)}${r.batch?' • '+esc(r.batch):''}</small></div><span class="badge ${r.status==='Present'?'green':'red'}">${esc(r.status)}</span></div>`).join('')||'<div class="empty">No students in this register.</div>'}</div><div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`)}
+function openLabSetup(){openModal(`<h3>Add Lab</h3><div class="formGrid"><div class="field"><label>Lab Name</label><input id="ln" placeholder="Data Structures Lab"></div><div class="field"><label>Lab ID</label><input id="lid" placeholder="DS-LAB-01"></div><div class="field full"><label>Attendance Mode</label><select id="lm"><option>Section-wise</option><option>Batch-wise</option></select></div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLabSetup()">Save Lab</button></div>`)}
+function saveLabSetup(){const labName=document.getElementById('ln').value.trim(),labId=document.getElementById('lid').value.trim();if(!labName||!labId)return alert('Lab name and ID required.');if(data.labs.some(l=>l.labId===labId))return alert('A lab with this Lab ID already exists.');data.labs.push({id:uid('lab'),labName,labId,mode:document.getElementById('lm').value});save();closeModal();render('labs');toast('Lab added ✓')}
+function openLabRegister(){if(!data.labs.length)return alert('Add a lab first.');const labs=[...new Map(data.labs.map(x=>[x.labId,x])).values()];openModal(`<h3>Lab Attendance Register</h3><div class="formGrid"><div class="field"><label>Lab</label><select id="lrLab">${labs.map(l=>`<option value="${esc(l.labId)}">${esc(l.labName)} — ${esc(l.labId)}</option>`).join('')}</select></div><div class="field"><label>Date</label><input id="lrDate" type="date" value="${new Date().toISOString().slice(0,10)}"></div><div class="field"><label>Lab Number</label><input id="lrNo" type="number" min="1" value="5"></div><div class="field"><label>Experiment Number</label><input id="lrExp" type="number" min="1" value="1"></div><div class="field"><label>Section</label><select id="lrSec">${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Batch (optional)</label><select id="lrBatch"><option value="">Whole Section</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option><option>D1</option><option>D2</option><option>E1</option><option>E2</option></select></div></div><div class="toolbar"><button class="secondary small" onclick="loadLabStudents()">Load Students</button><button class="secondary small" onclick="setLabAll('Present')">All Present</button><button class="secondary small" onclick="setLabAll('Absent')">All Absent</button></div><div id="labStudents" class="list"><div class="empty">Choose details and click Load Students.</div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveLabRegister()">Save Lab Attendance</button></div>`)}
+function loadLabStudents(){const sec=document.getElementById('lrSec').value,b=document.getElementById('lrBatch').value;const list=Object.entries(data.users).filter(([k,u])=>u.role==='Student'&&u.section===sec&&(!b||!u.batch||u.batch===b));document.getElementById('labStudents').innerHTML=list.map(([k,u])=>`<div class="row labRow" data-id="${esc(k)}" data-status="Present"><div><b>${esc(u.name)}</b><small>${esc(k)} • Section ${esc(u.section)}${u.batch?' • '+esc(u.batch):''}</small></div><div class="actions"><button class="statusBtn on" data-status="Present" onclick="setLabStatus(this,'Present')">Present</button><button class="statusBtn" data-status="Absent" onclick="setLabStatus(this,'Absent')">Absent</button></div></div>`).join('')||'<div class="empty">No students match this section/batch.</div>'}
+function setLabStatus(btn,status){const row=btn.closest('.labRow');row.dataset.status=status;row.querySelectorAll('.statusBtn').forEach(b=>b.classList.toggle('on',b.dataset.status===status))}
+function setLabAll(status){document.querySelectorAll('.labRow').forEach(r=>{r.dataset.status=status;r.querySelectorAll('.statusBtn').forEach(b=>b.classList.toggle('on',b.dataset.status===status))})}
+function saveLabRegister(){const labId=document.getElementById('lrLab').value,lab=data.labs.find(x=>x.labId===labId),date=document.getElementById('lrDate').value,labNumber=document.getElementById('lrNo').value,experimentNo=document.getElementById('lrExp').value,section=document.getElementById('lrSec').value,batch=document.getElementById('lrBatch').value,rows=[...document.querySelectorAll('.labRow')];if(!rows.length)return alert('Load students first.');const sessionId=uid('ls');data.labSessions.push({id:sessionId,labId,labName:lab.labName,date,labNumber,experimentNo,section,batch,teacher:currentUser});rows.forEach(r=>data.labAttendance.push({id:uid('la'),sessionId,student:r.dataset.id,labId,labName:lab.labName,date,labNumber,experimentNo,section,batch,status:r.dataset.status||'Present',teacher:currentUser}));save();closeModal();render('labs');toast('Lab attendance saved ✓')}
+
+function attachmentHtml(a, actionFn, id){
+ if(!a||(!a.data&&!a.driveLink))return '';
+ const isImg=(a.type||'').startsWith('image/');
+ const safeName=esc(a.name||'Attachment');
+ const badge=a.driveLink?'<span class="badge green" style="margin-left:6px">Google Drive</span>':'<span class="badge" style="margin-left:6px">Local</span>';
+ const driveBtn=a.driveLink?`<a href="${esc(a.driveLink)}" target="_blank" rel="noopener" class="secondary small" style="display:inline-block;text-decoration:none;padding:8px 10px;border:1px solid var(--line);border-radius:7px" onclick="event.stopPropagation()">Open in Drive</a>`:'';
+ if(a.data){
+  const safeData=esc(a.data);
+  if(isImg) return `<div class="attachmentCard"><img class="noticeImage" src="${safeData}" alt="${safeName}" onclick="event.stopPropagation();${actionFn}('${id}')"><div class="attachmentMeta"><span>🖼️ ${safeName}${badge}</span><div class="actions">${driveBtn}<button class="secondary small" onclick="event.stopPropagation();${actionFn}('${id}')">Open image</button></div></div></div>`;
+  return `<div class="attachmentCard"><div class="pdfPreview">📄 <b>${safeName}</b><span>PDF document</span></div><div class="attachmentMeta"><span>PDF attachment${badge}</span><div class="actions">${driveBtn}<button class="secondary small" onclick="event.stopPropagation();${actionFn}('${id}')">Open PDF</button></div></div></div>`;
+ }
+ return `<div class="attachmentCard"><div class="pdfPreview">☁️ <b>${safeName}</b><span>Stored in Google Drive</span></div><div class="attachmentMeta"><span>${badge}</span><div class="actions">${driveBtn}</div></div></div>`;
+}
+function notificationPage(){
+ const u=me(),mine=visibleNotifications().slice().reverse(),notices=(u.role==='Student'?data.notices.filter(n=>n.target==='All'||n.target==='All Students'||n.target==='Section '+(u.section||'')):data.notices.slice()).slice().reverse();
+ const renderAttach=(n,fn)=>n.attachment?attachmentHtml(n.attachment,fn,n.id):'';
+ return `<div class="grid2"><div class="card"><div class="title"><div><h3>Notifications</h3><div class="muted">${mine.filter(x=>!x.read).length} unread • Photo/PDF attachments supported</div></div><button class="secondary small" onclick="markNotifications()">Mark all read</button></div><div class="list" style="margin-top:12px">${mine.map(n=>`<div class="row notificationRow" style="${n.read?'opacity:.6':''}" onclick="readNotification('${n.id}')"><div style="flex:1"><b>${esc(n.title)}</b><small>${esc(n.text)}</small><small>${esc(n.date)}</small>${renderAttach(n,'openNoticeAttachment')}</div><span class="badge ${n.type==='success'?'green':'purple'}">${esc(n.type)}</span></div>`).join('')||'<div class="empty">No notifications.</div>'}</div></div><div class="card"><div class="title"><div><h3>Year / Section Notices</h3><div class="muted">Admin can notify the whole year; teachers can notify their allowed classes.</div></div>${u.role!=='Student'?'<button class="primary small" onclick="openNotice()">＋ Notice</button>':''}</div><div class="list" style="margin-top:12px">${notices.map(n=>`<div class="row notificationRow"><div style="flex:1"><b>${esc(n.title)}</b><small>${esc(n.text)}</small><small>${esc(n.date)} • ${esc(n.target)}</small>${renderAttach(n,'openNoticeFile')}</div>${u.role==='Admin'?`<button class="danger small" onclick="deleteNotice('${n.id}')">Delete</button>`:''}</div>`).join('')||'<div class="empty">No notices.</div>'}</div></div></div>`;
+}
+function readNotification(id){const n=data.notifications.find(x=>x.id===id);if(n)n.read=true;save();render('notifications')}
+function markNotifications(){visibleNotifications().forEach(n=>n.read=true);save();render('notifications')}
+function openNotice(){const targets=me().role==='Admin'?['All','All Students',...sections.map(x=>'Section '+x)]:['All Students','Section '+(me().section||'A')];const hint=driveConnected()?'Connected to Google Drive — larger files upload straight to your Drive folder.':'Google Drive not connected. File stays in this browser only, max 1.5 MB.';openModal(`<h3>Send Notification</h3><div class="field"><label>Title</label><input id="nt"></div><div class="field"><label>Message</label><textarea id="nx" rows="4"></textarea></div><div class="field"><label>Target</label><select id="ng">${targets.map(x=>`<option>${esc(x)}</option>`).join('')}</select></div><div class="field"><label>Photo / PDF</label><div class="fileBox"><input id="nfile" type="file" accept="application/pdf,image/*"><small>${hint}</small></div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveNotice()">Send Notification</button></div>`)}
+async function saveNotice(){const title=document.getElementById('nt').value.trim(),text=document.getElementById('nx').value.trim(),target=document.getElementById('ng').value,f=document.getElementById('nfile')?.files?.[0];if(!title||!text)return alert('Title and message required.');let attachment=null;if(f){try{attachment=await handleUpload(f,{maxLocalMB:1.5});}catch(e){return alert('For this local build, notification attachments must be 1.5 MB or smaller, or connect Google Drive for larger files.');}}const n={id:uid('n'),title,text,target,date:new Date().toLocaleString(),attachment,author:currentUser};data.notices.push(n);data.notifications.push({...n,type:'info',read:false});save();closeModal();render(currentPage);toast('Notification sent ✓')}
+function openNoticeFile(id){const n=data.notices.find(x=>x.id===id);if(!n?.attachment)return;if(n.attachment.data){const a=document.createElement('a');a.href=n.attachment.data;a.target='_blank';a.download=n.attachment.name;a.click()}else if(n.attachment.driveLink)window.open(n.attachment.driveLink,'_blank')}
+function openNoticeAttachment(id){const n=data.notifications.find(x=>x.id===id);if(!n?.attachment)return;if(n.attachment.data){const a=document.createElement('a');a.href=n.attachment.data;a.target='_blank';a.download=n.attachment.name;a.click()}else if(n.attachment.driveLink)window.open(n.attachment.driveLink,'_blank')}
+
+function directoryPage(){
+ const u=me(),rows=Object.entries(data.users).filter(([k,x])=>u.role==='Admin'||x.role==='Student');
+ return `<div class="card"><div class="title"><div><h3>${u.role==='Admin'?'Campus Directory':'Student Directory'}</h3><div class="muted">Search students and teachers.</div></div></div><div class="toolbar"><input id="dq" oninput="filterDir()" placeholder="Search name or username"><select id="dsec" onchange="filterDir()"><option value="">All Sections</option>${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div id="dirList" class="list">${rows.map(([k,x])=>`<div class="row dirItem" data-q="${esc((x.name+' '+k+' '+x.role).toLowerCase())}" data-s="${esc(x.section||'')}"><div class="profile"><div class="avatar">${esc((x.name||k).slice(0,1))}</div><div><b>${esc(x.name)}</b><small>${esc(x.role)} • ${esc(k)}${x.section?' • Section '+x.section:''}</small></div></div><button class="secondary small" onclick="viewProfile('${k}')">View</button></div>`).join('')}</div></div>`;
+}
+function filterDir(){const q=document.getElementById('dq').value.toLowerCase(),s=document.getElementById('dsec').value;document.querySelectorAll('.dirItem').forEach(x=>x.style.display=(!q||x.dataset.q.includes(q))&&(!s||x.dataset.s===s)?'flex':'none')}
+function viewProfile(id){const u=data.users[id],r=data.results.filter(x=>x.student===id),a=data.attendance.filter(x=>x.student===id),p=a.length?Math.round(a.filter(x=>x.status==='Present').length/a.length*100):0;openModal(`<div class="profile"><div class="avatar">${esc((u.name||id).slice(0,1))}</div><div><h3 style="margin:0">${esc(u.name)}</h3><div class="muted">${esc(u.role)} • ${esc(id)}${u.section?' • Section '+esc(u.section):''}</div></div></div>${u.role==='Student'?`<div class="metrics">${metric(p+'%','Attendance')}${metric(r.reduce((z,x)=>z+x.marks,0),'Marks')}${metric(r.length,'Subjects')}${metric(u.section||'—','Section')}</div>`:`<div class="card" style="margin-top:12px">Department: <b>${esc(u.department||'—')}</b></div>`}<div class="modalActions"><button class="primary" onclick="closeModal()">Close</button></div>`)}
+
+
+function profilePage(){const u=me();return `<div class="card"><div class="profile"><div class="avatar" style="width:64px;height:64px;font-size:24px">${esc((u.name||currentUser).slice(0,1))}</div><div><h2 style="margin:0">${esc(u.name)}</h2><span class="badge purple">${esc(u.role)}</span><div class="muted">${esc(currentUser)}</div></div></div></div><div class="card"><div class="title"><h3>Profile Information</h3><button class="primary small" onclick="editProfile()">Edit</button></div><div class="grid2" style="margin-top:12px"><div><small class="muted">Department</small><br><b>${esc(u.department||'—')}</b></div><div><small class="muted">Section</small><br><b>${esc(u.section||'—')}</b></div></div></div><div class="card"><button class="danger" style="width:100%" onclick="logout()">Logout</button></div>`}
+function editProfile(){const u=me();openModal(`<h3>Edit Profile</h3><div class="formGrid"><div class="field"><label>Full Name</label><input id="pn" value="${esc(u.name)}"></div><div class="field"><label>Department</label><input id="pd" value="${esc(u.department||'')}"></div>${u.role==='Student'?`<div class="field"><label>Section</label><select id="ps">${sections.map(x=>`<option ${x===u.section?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class="field"><label>New Password</label><input id="pp" placeholder="Leave blank to keep"></div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveProfile()">Save</button></div>`)}
+function saveProfile(){const u=me();u.name=document.getElementById('pn').value.trim()||u.name;u.department=document.getElementById('pd').value.trim();if(document.getElementById('ps'))u.section=document.getElementById('ps').value;const p=document.getElementById('pp').value.trim();if(p)u.password=p;save();closeModal();updateUserUI();render('profile');toast('Profile updated ✓')}
+
+function classesPage(){const maps=data.timetable.filter(x=>x.teacher===currentUser),grp={};maps.forEach(x=>(grp[x.section+'|'+x.subject]??=[]).push(x));return `<div class="card"><div class="title"><div><h3>My Classes</h3><div class="muted">Subjects, sections and rooms assigned to you.</div></div></div><div class="grid3" style="margin-top:12px">${Object.entries(grp).map(([k,v])=>{const [sec,sub]=k.split('|');return `<div class="card"><span class="badge purple">Section ${esc(sec)}</span><h3 style="font-size:13px">${esc(sub)}</h3><div class="muted">${v.map(x=>x.day+' • '+periods[x.period]+' • '+(x.room||'')).join('<br>')}</div></div>`}).join('')||'<div class="empty">No classes assigned.</div>'}</div></div>`}
+
+window.driveState=window.driveState||{token:null,email:null,folderId:null};
+function driveConnected(){return !!(window.driveState&&window.driveState.token)}
+function driveFolderUrl(){const w=window.AICampusWorkspace?.get?.()||{};return w.driveFolderId?('https://drive.google.com/drive/folders/'+w.driveFolderId):''}
+function fileToDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Could not read file'));r.readAsDataURL(file)})}
+async function handleUpload(file,opts){
+ opts=opts||{};const maxLocalMB=opts.maxLocalMB||2,localPreviewCapKB=300;
+ if(!file)return null;
+ if(driveConnected()){
+  try{
+   const res=await uploadFileToDrive(file);
+   const out={name:file.name,type:file.type,driveLink:res.webViewLink||('https://drive.google.com/file/d/'+res.id+'/view')};
+   if(file.size<=localPreviewCapKB*1024)out.data=await fileToDataURL(file);
+   return out;
+  }catch(e){console.error(e);toast('Google Drive upload failed — saved locally instead');}
+ }
+ if(file.size>maxLocalMB*1024*1024){const err=new Error('SIZE_LIMIT');err.code='SIZE_LIMIT';throw err;}
+ return {name:file.name,type:file.type,data:await fileToDataURL(file)};
+}
+async function driveApi(url,options={}){const r=await fetch(url,{...options,headers:{...(options.headers||{}),Authorization:'Bearer '+driveState.token}});if(!r.ok)throw new Error(await r.text());return r.json()}
+async function ensureDriveFolder(w){const name='AI Campus OS - '+(w.department||'Department')+' - '+(w.year||'Year');const q=`name='${name.replace(/'/g,"\\'")}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;const found=await driveApi('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(q)+'&fields=files(id,name)');if(found.files?.[0])return found.files[0];return driveApi('https://www.googleapis.com/drive/v3/files',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,mimeType:'application/vnd.google-apps.folder'})})}
+async function uploadFileToDrive(file){if(!driveState.token)return null;const w=window.AICampusWorkspace.get()||{};const folderId=driveState.folderId||w.driveFolderId;if(!folderId)throw new Error('No Drive folder');const meta={name:file.name,parents:[folderId]};const body=new FormData();body.append('metadata',new Blob([JSON.stringify(meta)],{type:'application/json'}));body.append('file',file);const r=await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',{method:'POST',headers:{Authorization:'Bearer '+driveState.token},body});if(!r.ok)throw new Error(await r.text());return r.json()}
+function connectGoogleDrive(){const cid=window.AI_CAMPUS_CONFIG?.googleClientId||'';if(!cid||cid.includes('PASTE_'))return openModal(`<h3>Connect your Google Drive</h3><p>Google Drive is built into this version, but the Google OAuth Web Client ID is not configured.</p><p>Add your OAuth Web Client ID to <b>config.js</b>, then redeploy. The Admin will then get Google's <b>account chooser</b> and can select their own Gmail.</p><p class="muted">No fixed Gmail is hard-coded.</p><div class="modalActions"><button class="primary" onclick="closeModal()">OK</button></div>`);if(!window.google?.accounts?.oauth2)return openModal(`<h3>Google sign-in is loading</h3><p>Wait a moment and press the Drive button again.</p><div class="modalActions"><button class="primary" onclick="closeModal()">OK</button></div>`);const tokenClient=google.accounts.oauth2.initTokenClient({client_id:cid,scope:'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.metadata.readonly',callback:async(resp)=>{if(resp.error){toast('Google connection cancelled');return}try{driveState.token=resp.access_token;const about=await driveApi('https://www.googleapis.com/drive/v3/about?fields=user');driveState.email=about.user?.emailAddress||'Google account';const w=window.AICampusWorkspace.get()||{};const folder=await ensureDriveFolder(w);driveState.folderId=folder.id;w.driveConnected=true;w.driveEmail=driveState.email;w.driveFolderId=folder.id;localStorage.setItem('aicampus_workspace',JSON.stringify(w));save();closeModal();render('workspace');toast('Google Drive connected ✓')}catch(e){console.error(e);toast('Drive connection failed')}}});tokenClient.requestAccessToken({prompt:'select_account'})}
+function workspacePage(){
+ const w=window.AICampusWorkspace?.get?.()||{department:'',year:'',adminEmail:'',workspaceId:'',driveConnected:false};
+ const live=driveConnected();
+ const status=live?'Connected':(w.driveConnected?'Reconnect needed':'Not connected');
+ const badgeClass=live?'green':(w.driveConnected?'orange':'orange');
+ const folderUrl=driveFolderUrl();
+ const countDrive=n=>n.filter(x=>x.attachment?.driveLink||x.driveLink).length;
+ const aCount=data.assignments.filter(x=>x.attachment).length, aDrive=countDrive(data.assignments);
+ const tCount=(data.timetableFiles||[]).length, tDrive=(data.timetableFiles||[]).filter(x=>x.driveLink).length;
+ const nCount=data.notices.filter(x=>x.attachment).length, nDrive=countDrive(data.notices);
+ return `<div class="hero"><div><span class="badge purple">PRIVATE WORKSPACE</span><h1>${esc(w.department||'Department')} • ${esc(w.year||'Year')}</h1><p>This Department + Year behaves like a separate app. Its data and Drive folder are kept separate.</p></div><button class="primary" onclick="connectGoogleDrive()">${live?'✓ Google Drive Connected':(w.driveConnected?'Reconnect Google Drive':'Connect Google Drive')}</button></div><div class="grid2" style="margin-top:12px"><div class="card"><div class="title"><h3>Workspace</h3><span class="badge green">Isolated</span></div><p class="muted">Workspace ID</p><b>${esc(w.workspaceId||'Not created')}</b><p class="muted" style="margin-top:12px">Admin</p><b>${esc(w.adminEmail||currentUser||'—')}</b></div><div class="card"><div class="title"><h3>Google Drive</h3><span class="badge ${badgeClass}">${status}</span></div><p class="muted">${w.driveConnected?'Connected account: '+esc(w.driveEmail||'Google account'):'Admin chooses the Google account with the Google account chooser.'}</p>${w.driveConnected&&!live?'<p class="muted" style="color:#b26a00">Your Drive sign-in expired for this browser session. Uploads will stay local until you reconnect.</p>':''}${folderUrl?`<p><a href="${esc(folderUrl)}" target="_blank" rel="noopener">Open Drive folder ↗</a></p>`:''}<button class="secondary" onclick="connectGoogleDrive()">${w.driveConnected?'Reconnect / Change account':'Connect my Google Drive'}</button></div></div><div class="card"><div class="title"><h3>Workspace File Areas</h3></div><div class="grid3" style="margin-top:12px"><div><b>Assignments</b><div class="muted">${aCount} file(s) • ${aDrive} in Drive</div></div><div><b>Timetable</b><div class="muted">${tCount} file(s) • ${tDrive} in Drive</div></div><div><b>Notifications</b><div class="muted">${nCount} file(s) • ${nDrive} in Drive</div></div></div></div>`;
+}
+
+function adminPage(){
+ const st=Object.entries(data.users).filter(([k,u])=>u.role==='Student'),te=Object.entries(data.users).filter(([k,u])=>u.role==='Teacher');
+ return `<div class="card"><div class="title"><div><h3>Admin Control Center 2.0</h3><div class="muted">Users, notices, academic setup and system data.</div></div><div class="actions"><button class="primary small" onclick="openUser('Student')">＋ Student</button><button class="secondary small" onclick="openUser('Teacher')">＋ Teacher</button></div></div><div class="toolbar"><input id="uq" oninput="filterUsers()" placeholder="Search users"><select id="ur" onchange="filterUsers()"><option value="">All Roles</option><option>Student</option><option>Teacher</option></select></div><div id="userList" class="list">${[...st,...te].map(([k,u])=>`<div class="row userRow" data-q="${esc((u.name+' '+k+' '+u.role).toLowerCase())}" data-r="${u.role}"><div><b>${esc(u.name)}</b><small>${esc(k)} • ${esc(u.role)}${u.section?' • Section '+u.section:''}</small></div><div class="actions"><span class="badge ${u.disabled?'red':'green'}">${u.disabled?'Disabled':'Active'}</span><button class="secondary small" onclick="editUser('${k}')">Edit</button><button class="danger small" onclick="toggleUser('${k}')">${u.disabled?'Enable':'Disable'}</button></div></div>`).join('')}</div></div><div class="grid2"><div class="card"><div class="title"><h3>System</h3><button class="secondary small" onclick="exportData()">Export</button></div><div class="muted" style="margin-top:10px">Users: ${Object.keys(data.users).length}<br>Assignments: ${data.assignments.length}<br>Marks: ${data.results.length}<br>Attendance records: ${data.attendance.length}<br>Timetable entries: ${data.timetable.length}</div></div><div class="card"><div class="title"><h3>Notices</h3><button class="primary small" onclick="openNotice()">＋ Notice</button></div><div class="list" style="margin-top:10px">${data.notices.slice().reverse().slice(0,5).map(n=>`<div class="row"><div><b>${esc(n.title)}</b><small>${esc(n.target)}</small></div><button class="danger small" onclick="deleteNotice('${n.id}')">Delete</button></div>`).join('')}</div></div></div>`;
+}
+function filterUsers(){const q=document.getElementById('uq').value.toLowerCase(),r=document.getElementById('ur').value;document.querySelectorAll('.userRow').forEach(x=>x.style.display=(!q||x.dataset.q.includes(q))&&(!r||x.dataset.r===r)?'flex':'none')}
+function openUser(role){openModal(`<h3>Add ${role}</h3><div class="formGrid"><div class="field"><label>Username</label><input id="un"></div><div class="field"><label>Full Name</label><input id="uf"></div><div class="field"><label>Password</label><input id="up" value="1234"></div><div class="field"><label>Department</label><input id="ud" value="Computer Science"></div>${role==='Student'?`<div class="field"><label>Section</label><select id="us">${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Batch</label><select id="ub"><option value="">None</option>${['A1','A2','B1','B2','C1','C2','D1','D2','E1','E2'].map(x=>`<option>${x}</option>`).join('')}</select></div>`:''}</div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveUser('${role}')">Create</button></div>`)}
+function saveUser(role){const id=document.getElementById('un').value.trim().toLowerCase(),name=document.getElementById('uf').value.trim(),pass=document.getElementById('up').value.trim();if(!id||!name||!pass)return alert('Username, name and password required.');if(data.users[id])return alert('Username already exists.');data.users[id]={name,role,password:pass,department:document.getElementById('ud').value.trim(),disabled:false};if(role==='Student'){data.users[id].section=document.getElementById('us').value;data.users[id].batch=document.getElementById('ub')?.value||'';}save();closeModal();render('admin');toast(role+' created ✓')}
+function editUser(id){const u=data.users[id];openModal(`<h3>Edit User</h3><div class="formGrid"><div class="field"><label>Full Name</label><input id="en" value="${esc(u.name)}"></div><div class="field"><label>Department</label><input id="ed" value="${esc(u.department||'')}"></div>${u.role==='Student'?`<div class="field"><label>Section</label><select id="es">${sections.map(x=>`<option ${x===u.section?'selected':''}>${x}</option>`).join('')}</select></div><div class="field"><label>Batch</label><select id="eb"><option value="">None</option>${['A1','A2','B1','B2','C1','C2','D1','D2','E1','E2'].map(x=>`<option ${x===u.batch?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class="field"><label>New Password</label><input id="ep" placeholder="Leave blank"></div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="updateUser('${id}')">Save</button></div>`)}
+function updateUser(id){const u=data.users[id];u.name=document.getElementById('en').value.trim()||u.name;u.department=document.getElementById('ed').value.trim();if(document.getElementById('es')){u.section=document.getElementById('es').value;u.batch=document.getElementById('eb')?.value||'';}const p=document.getElementById('ep').value.trim();if(p)u.password=p;save();closeModal();render('admin');toast('User updated ✓')}
+function toggleUser(id){if(id===currentUser)return alert('You cannot disable your current Admin account.');data.users[id].disabled=!data.users[id].disabled;save();render('admin');toast(data.users[id].disabled?'User disabled':'User enabled')}
+function deleteNotice(id){if(confirm('Delete notice?')){data.notices=data.notices.filter(x=>x.id!==id);save();render('admin')}}
+function exportData(){const b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='ai-campus-os-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast('Backup exported ✓')}
+
+(function init(){const sess=sessionStorage.getItem(SESSION);if(sess&&data.users[sess]&&!data.users[sess].disabled){currentUser=sess;showApp();render(location.hash.slice(1)||'dashboard')}})();
+</script>
+
+<script>
+/* V41 Stability + UX layer */
+(function(){
+  const baseRender=window.render;
+  window.render=function(page){
+    baseRender(page);
+    if(location.hash!=='#'+page) history.pushState({page:page},'', '#'+page);
+  };
+  document.addEventListener('click',function(e){
+    const sb=document.getElementById('sidebar');
+    if(sb && sb.classList.contains('open') &&
+       !e.target.closest('#sidebar') && !e.target.closest('.mobileMenu')){
+      sb.classList.remove('open');
+    }
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      const modal=document.getElementById('modal');
+      if(modal && modal.classList.contains('show')) window.closeModal();
+      const sb=document.getElementById('sidebar');
+      if(sb) sb.classList.remove('open');
+    }
+  });
+  window.addEventListener('popstate',function(){
+    if(window.currentUser){
+      const p=(location.hash||'#dashboard').slice(1)||'dashboard';
+      baseRender(p);
+    }
+  });
+})();
+</script>
+
+<script>
+window.AICampusWorkspace=window.AICampusWorkspace||(()=>{const K="aicampus_workspace";let s=JSON.parse(localStorage.getItem(K)||"null");
+function save(){localStorage.setItem(K,JSON.stringify(s))}
+function create(dept,year,email){s={workspaceId:(dept+"_"+year).toLowerCase().replace(/[^a-z0-9]+/g,"_"),department:dept,year,adminEmail:email,driveConnected:false};save();return s}
+return {get:()=>s,create,clear:()=>{localStorage.removeItem(K);location.reload()},configured:()=>!!s?.workspaceId};})();
+</script>
+
+<script>
+/* Stage 1 — Supabase Auth: real, shared, multi-device accounts.
+   Fully additive: if config.js / supabase-config.js are left with their
+   placeholder values, this block does nothing and the app behaves
+   exactly like the local single-browser demo it always has. */
+(function(){
+ const cfg=window.SUPABASE_CONFIG||{};
+ const usable=cfg.url && !cfg.url.includes('YOUR-PROJECT') && cfg.anonKey && !cfg.anonKey.includes('YOUR_SUPABASE') && window.supabase;
+ window.cloudMode=()=>!!usable;
+ if(!usable) return;
+
+ const SB=window.supabase.createClient(cfg.url, cfg.anonKey);
+ window.SB=SB;
+ const cap=r=>r?r.charAt(0).toUpperCase()+r.slice(1):r;
+
+ async function loadWorkspaces(){
+  const sel=document.getElementById('suWorkspace');
+  if(!sel)return;
+  const {data:ws,error}=await SB.from('workspaces').select('id,department,year_no,name').order('name');
+  sel.innerHTML=(!error&&ws&&ws.length)?ws.map(w=>`<option value="${w.id}">${w.name}</option>`).join(''):'<option value="">No workspace yet — ask your Admin</option>';
+ }
+
+ window.showSignup=function(){
+  document.getElementById('loginFormWrap').classList.add('hidden');
+  document.getElementById('signupFormWrap').classList.remove('hidden');
+  document.getElementById('pendingWrap').classList.add('hidden');
+  loadWorkspaces();
+ };
+ window.showLogin=function(){
+  document.getElementById('signupFormWrap').classList.add('hidden');
+  document.getElementById('pendingWrap').classList.add('hidden');
+  document.getElementById('loginFormWrap').classList.remove('hidden');
+ };
+ window.cloudLogout=function(){ SB.auth.signOut(); window.showLogin(); };
+
+ let myWorkspaceId=null;
+
+ async function loadWorkspaceRoster(workspaceId){
+  const {data:rows,error}=await SB.from('profiles').select('id,email,full_name,role,workspace_id,section,batch,active').eq('workspace_id',workspaceId);
+  if(error||!rows)return;
+  data.users={};
+  rows.forEach(p=>{
+   data.users[p.id]={name:p.full_name||p.email||p.id,email:p.email||'',role:cap(p.role),department:'',section:p.section||'',batch:p.batch||'',disabled:!p.active,_cloudId:p.id};
+  });
+ }
+ window.refreshRoster=async function(){ if(myWorkspaceId)await loadWorkspaceRoster(myWorkspaceId); };
+
+ async function applySession(session){
+  if(!session)return false;
+  const {data:{user}}=await SB.auth.getUser();
+  if(!user)return false;
+  const {data:profile,error}=await SB.from('profiles').select('*').eq('id',user.id).single();
+  if(error||!profile)return false;
+  if(!profile.workspace_id){
+   document.getElementById('loginFormWrap').classList.add('hidden');
+   document.getElementById('signupFormWrap').classList.add('hidden');
+   document.getElementById('pendingWrap').classList.remove('hidden');
+   return false;
+  }
+  myWorkspaceId=profile.workspace_id;
+  await loadWorkspaceRoster(profile.workspace_id);
+  currentUser=profile.id;
+  save();
+  showApp();
+  render('dashboard');
+  return true;
+ }
+
+ // The login field takes either a username (Admin-created accounts,
+ // which live under a non-routable synthetic email) or a real email
+ // (self-signed-up accounts) — whichever the person types.
+ window.login=async function(){
+  const raw=document.getElementById('loginUser').value.trim();
+  const email=raw.includes('@')?raw:(raw.toLowerCase()+'@aicampusos.invalid');
+  const pass=document.getElementById('loginPass').value;
+  const errEl=document.getElementById('loginErr');
+  errEl.textContent='';
+  const {data:sess,error}=await SB.auth.signInWithPassword({email,password:pass});
+  if(error){ errEl.textContent='Invalid username/email or password.'; return; }
+  const ok=await applySession(sess.session);
+  if(!ok && document.getElementById('pendingWrap').classList.contains('hidden')) errEl.textContent='Could not load your profile. Contact your Admin.';
+ };
+
+ window.signUp=async function(){
+  const name=document.getElementById('suName').value.trim();
+  const email=document.getElementById('suEmail').value.trim();
+  const pass=document.getElementById('suPass').value;
+  const wid=document.getElementById('suWorkspace').value;
+  const errEl=document.getElementById('signupErr');
+  errEl.textContent='';
+  if(!name||!email||!pass){ errEl.textContent='Fill in all fields.'; return; }
+  if(!wid){ errEl.textContent='Select your Department + Year.'; return; }
+  const {data:sess,error}=await SB.auth.signUp({email,password:pass,options:{data:{full_name:name,workspace_id:wid}}});
+  if(error){ errEl.textContent=error.message||'Could not create account.'; return; }
+  if(sess.session){ await applySession(sess.session); }
+  else{
+   document.getElementById('signupFormWrap').classList.add('hidden');
+   document.getElementById('pendingWrap').classList.remove('hidden');
+   const p=document.querySelector('#pendingWrap p'); if(p)p.textContent='Check your email to confirm your account, then sign in.';
+  }
+ };
+
+ const baseLogout=window.logout;
+ window.logout=function(){ SB.auth.signOut().catch(()=>{}); baseLogout(); };
+
+ // Admin creates real logins directly (username + password), via the
+ // admin-create-user Edge Function — the only place the service-role
+ // key is used, and it never reaches the browser.
+ window.openUser=function(role){
+  openModal(`<h3>Add ${role}</h3><div class="formGrid"><div class="field"><label>Username</label><input id="cnu" placeholder="e.g. rahul.singh"></div><div class="field"><label>Full Name</label><input id="cnf"></div><div class="field"><label>Password</label><input id="cnp" value="changeme123"></div>${role==='Student'?`<div class="field"><label>Section</label><select id="cns">${sections.map(x=>`<option>${x}</option>`).join('')}</select></div><div class="field"><label>Batch</label><select id="cnb"><option value="">None</option>${['A1','A2','B1','B2','C1','C2','D1','D2','E1','E2'].map(x=>`<option>${x}</option>`).join('')}</select></div>`:''}</div><div id="cnErr" style="color:#c0392b;font-size:10px;min-height:14px"></div><div class="muted" style="margin-top:6px">Give this username and password to the ${role.toLowerCase()} — that's how they'll sign in.</div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="cloudCreateUser('${role}')">Create</button></div>`);
+ };
+ window.cloudCreateUser=async function(role){
+  const username=document.getElementById('cnu').value.trim().toLowerCase();
+  const fullName=document.getElementById('cnf').value.trim();
+  const password=document.getElementById('cnp').value;
+  const section=role==='Student'?document.getElementById('cns').value:null;
+  const batch=role==='Student'?(document.getElementById('cnb')?.value||null):null;
+  const errEl=document.getElementById('cnErr');
+  errEl.textContent='';
+  if(!username||!fullName||!password){ errEl.textContent='Fill in username, name and password.'; return; }
+  const {data:{session}}=await SB.auth.getSession();
+  if(!session){ errEl.textContent='Your session expired — sign in again.'; return; }
+  try{
+   const res=await fetch(cfg.url+'/functions/v1/admin-create-user',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':cfg.anonKey},
+    body:JSON.stringify({username,password,fullName,role:role.toLowerCase(),section,batch})
+   });
+   const out=await res.json().catch(()=>({error:'Unexpected server response.'}));
+   if(!res.ok||out.error){ errEl.textContent=out.error||'Could not create account.'; return; }
+   closeModal();
+   await window.refreshRoster();
+   render('admin');
+   toast(role+' account created ✓ — share the username & password with them.');
+  }catch(e){ errEl.textContent='Could not reach the account-creation server function. Is it deployed? See EDGE_FUNCTION_SETUP.md.'; }
+ };
+ window.editUser=function(id){
+  const u=data.users[id]; if(!u)return;
+  openModal(`<h3>Manage Member</h3><div class="formGrid"><div class="field"><label>Name</label><input value="${esc(u.name)}" disabled></div><div class="field"><label>Role</label><select id="cur"><option ${u.role==='Student'?'selected':''}>Student</option><option ${u.role==='Teacher'?'selected':''}>Teacher</option><option ${u.role==='Admin'?'selected':''}>Admin</option></select></div><div class="field"><label>Section</label><select id="cus"><option value="">None</option>${sections.map(x=>`<option ${x===u.section?'selected':''}>${x}</option>`).join('')}</select></div></div><div class="modalActions"><button class="secondary" onclick="closeModal()">Cancel</button><button class="primary" onclick="cloudUpdateUser('${id}')">Save</button></div>`);
+ };
+ window.cloudUpdateUser=async function(id){
+  const role=document.getElementById('cur').value.toLowerCase();
+  const section=document.getElementById('cus').value||null;
+  const {error}=await SB.from('profiles').update({role,section}).eq('id',id);
+  if(error){ alert('Could not update: '+error.message); return; }
+  data.users[id].role=cap(role); data.users[id].section=section||'';
+  closeModal(); render('admin'); toast('Member updated ✓');
+ };
+ window.toggleUser=async function(id){
+  if(id===currentUser)return alert('You cannot disable your current Admin account.');
+  const u=data.users[id]; if(!u)return; const next=!u.disabled;
+  const {error}=await SB.from('profiles').update({active:!next}).eq('id',id);
+  if(error){ alert('Could not update: '+error.message); return; }
+  u.disabled=next; render('admin'); toast(next?'User disabled':'User enabled');
+ };
+
+ // The demo login button was bound to the OLD local login() by value
+ // (onclick=login) before this script ran — rebind it to the cloud version.
+ const btn=document.getElementById('loginBtn'); if(btn)btn.onclick=window.login;
+ document.getElementById('cloudSignupLink')?.classList.remove('hidden');
+ document.getElementById('demoHint')?.classList.add('hidden');
+
+ SB.auth.getSession().then(({data:{session}})=>{ if(session)applySession(session); });
+})();
+</script>
+<style>
+#acw{position:fixed;inset:0;z-index:999999;background:#0b1020;color:#fff;display:flex;align-items:center;justify-content:center;font-family:system-ui}
+#acw[hidden]{display:none}#acw .card{width:min(480px,92%);padding:28px;border-radius:20px;background:#171f35}
+#acw input,#acw select,#acw button{width:100%;box-sizing:border-box;padding:12px;margin-top:8px;border-radius:10px}
+#acw input,#acw select{background:#0d1426;color:white;border:1px solid #46516e}
+#acw button{border:0;font-weight:700;cursor:pointer;margin-top:16px}
+</style>
+<div id="acw" hidden><div class="card">
+<h2>AI Campus OS</h2><p>Private Department + Year Workspace</p>
+<label>Department</label><input id="acwd" placeholder="CSE / Mechanical / Civil / Electrical">
+<label>Year</label><select id="acwy"><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select>
+<label>Admin Email</label><input id="acwe" type="email" placeholder="admin@example.com">
+<button id="acwb">Create / Open Workspace</button>
+<small>Every Department + Year is isolated: students, teachers, attendance, labs, assignments, timetable and notifications stay separate.</small>
+</div></div>
+<script>
+(()=>{const o=document.getElementById("acw");if(!window.AICampusWorkspace.configured())o.hidden=false;
+document.getElementById("acwb").onclick=()=>{let d=acwd.value.trim(),y=acwy.value,e=acwe.value.trim();if(!d||!e)return alert("Department and Admin email required.");AICampusWorkspace.create(d,y,e);o.hidden=true;window.dispatchEvent(new CustomEvent("workspaceReady"));};})();
+</script>
+<div style="text-align:center;padding:14px;font:12px system-ui;opacity:.55">Developer: Abhijeet Kumar Singh</div>
+
+<script>
+(function(){
+ document.addEventListener('click', function(e){
+   const s=e.target.closest('[data-student-subject]');
+   if(s){
+     e.preventDefault();
+     if(typeof window.viewStudentSubjectAttendance==='function') window.viewStudentSubjectAttendance(s.getAttribute('data-student-subject'));
+     return;
+   }
+   const v=e.target.closest('[data-view-attendance]');
+   if(v){
+     e.preventDefault();
+     try{
+       const d=JSON.parse(v.getAttribute('data-view-attendance'));
+       window.viewAttendanceSession(d.section,d.date,d.periodNo,d.lectureNo,d.subject,d.teacher);
+     }catch(err){ console.error(err); }
+     return;
+   }
+   const lb=e.target.closest('[data-lab-name]');
+   if(lb){
+     e.preventDefault();
+     if(typeof window.viewStudentLabAttendance==='function') window.viewStudentLabAttendance(lb.getAttribute('data-lab-name'));
+     return;
+   }
+ });
+})();
+</script>
+
+</body></html>
