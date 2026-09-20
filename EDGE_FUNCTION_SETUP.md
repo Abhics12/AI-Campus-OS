@@ -29,11 +29,17 @@ supabase link --project-ref YOUR_PROJECT_REF
 `YOUR_PROJECT_REF` is the short id in your Supabase project's URL:
 `https://YOUR_PROJECT_REF.supabase.co`
 
-## 3. Deploy the function
+## 3. Deploy the functions
 
 ```bash
 supabase functions deploy admin-create-user
+supabase functions deploy create-workspace
 ```
+
+`create-workspace` is what powers the "Setting up your college for the
+first time?" link on the login screen — it creates a Department+Year
+workspace and makes the person filling the form its Admin, in one step
+(no manual SQL needed anymore).
 
 That's it — you do **not** need to set any secrets by hand. Supabase
 automatically gives every Edge Function `SUPABASE_URL`, `SUPABASE_ANON_KEY`
